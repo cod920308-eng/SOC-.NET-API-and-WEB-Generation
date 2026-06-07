@@ -1,0 +1,607 @@
+﻿@page
+@model KMC_Main_WEB.Pages.AdminDashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --kmc-blue: #1a56db;
+            --kmc-blue-dark: #1e429f;
+            --kmc-blue-light: #e8f0fe;
+        }
+
+        .dash-page {
+            padding: 2.5rem 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dash-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+            .dash-header h1 {
+                font-size: clamp(1.6rem, 3vw, 2.2rem);
+                font-weight: 800;
+                color: #0f172a;
+                margin: 0;
+            }
+
+            .dash-header p {
+                color: #64748b;
+                font-size: 0.88rem;
+                margin-top: 4px;
+                margin-bottom: 0;
+            }
+
+        .admin-badge {
+            display: inline-block;
+            background: var(--kmc-blue-light);
+            color: var(--kmc-blue);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* TABS */
+        .dash-tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 1.75rem;
+            gap: 0;
+        }
+
+        .dash-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #64748b;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: -2px;
+        }
+
+            .dash-tab:hover {
+                color: var(--kmc-blue);
+            }
+
+            .dash-tab.active {
+                color: var(--kmc-blue);
+                border-bottom-color: var(--kmc-blue);
+            }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        /* TABLE */
+        .table-wrap {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(26,86,219,0.06);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8faff;
+            padding: 0.85rem 1.2rem;
+            text-align: left;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            font-size: 0.875rem;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8faff;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1.5px solid #fecaca;
+            color: #dc2626;
+            padding: 5px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .action-btn:hover {
+                background: #fef2f2;
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* ADD FORM */
+        .add-form-wrap {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(26,86,219,0.06);
+            margin-bottom: 2rem;
+        }
+
+            .add-form-wrap h3 {
+                font-size: 1.1rem;
+                font-weight: 800;
+                color: #0f172a;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+        /* ROLE SELECTOR */
+        .role-pills {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-pill {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: #f8faff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+            .role-pill.active {
+                background: var(--kmc-blue-light);
+                border-color: var(--kmc-blue);
+            }
+
+        .role-pill-icon {
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .role-pill-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .role-pill.active .role-pill-label {
+            color: var(--kmc-blue);
+        }
+
+        .role-desc {
+            font-size: 0.82rem;
+            color: #475569;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--kmc-blue-light);
+            border-left: 3px solid var(--kmc-blue);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .m-group {
+            margin-bottom: 1rem;
+        }
+
+        .m-label {
+            display: block;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 0.4rem;
+        }
+
+        .m-input {
+            width: 100%;
+            background: #f8faff;
+            border: 1.5px solid #e2e8f0;
+            color: #0f172a;
+            padding: 0.75rem 1rem;
+            font-size: 0.88rem;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+            .m-input:focus {
+                border-color: var(--kmc-blue);
+                background: white;
+                box-shadow: 0 0 0 3px rgba(26,86,219,0.08);
+            }
+
+            .m-input::placeholder {
+                color: #94a3b8;
+            }
+
+        .m-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .m-submit {
+            background: var(--kmc-blue);
+            color: white;
+            border: none;
+            padding: 0.85rem 2rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 0.5rem;
+        }
+
+            .m-submit:hover {
+                background: var(--kmc-blue-dark);
+            }
+
+        .m-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 0.75rem 1rem;
+            font-size: 0.82rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .m-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+            padding: 0.75rem 1rem;
+            font-size: 0.82rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--kmc-blue-light);
+            color: var(--kmc-blue);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @@media (max-width: 768px) {
+            .dash-page {
+                padding: 1.5rem 1rem 3rem;
+            }
+
+            .m-row {
+                grid-template-columns: 1fr;
+            }
+
+            td, th {
+                padding: 0.75rem 0.85rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+}
+
+<div class="dash-page">
+    <div class="dash-header">
+        <div>
+            <div class="admin-badge">🔑 Admin Panel</div>
+            <h1>Admin Dashboard</h1>
+            <p>Logged in as <strong style="color:var(--kmc-blue)">@Model.UserName</strong></p>
+        </div>
+    </div>
+
+    <div class="dash-tabs">
+        <button class="dash-tab active" onclick="switchTab('citizens', this)">👤 Citizens</button>
+        <button class="dash-tab" onclick="switchTab('organizers', this)">🎪 Organizers</button>
+        <button class="dash-tab" onclick="switchTab('add', this)">➕ Add Account</button>
+    </div>
+
+    <div id="tab-citizens" class="tab-content active">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="citizensBody">
+                    <tr><td colspan="4" class="empty-state">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+    <div id="tab-organizers" class="tab-content">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Organization</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="organizersBody">
+                    <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+   
+    <div id="tab-add" class="tab-content">
+        <div class="add-form-wrap">
+            <h3>Create New Account</h3>
+
+            <div class="role-pills">
+                <button type="button" class="role-pill active" onclick="setRole('Citizen', this)">
+                    <span class="role-pill-icon">👤</span>
+                    <span class="role-pill-label">Citizen</span>
+                </button>
+                <button type="button" class="role-pill" onclick="setRole('Organizer', this)">
+                    <span class="role-pill-icon">🎪</span>
+                    <span class="role-pill-label">Organizer</span>
+                </button>
+            </div>
+
+            <p class="role-desc" id="roleDesc">Citizens can browse and register for events on the platform.</p>
+
+            <div id="formMsg"></div>
+
+            <div class="m-group">
+                <label class="m-label">Full Name *</label>
+                <input class="m-input" id="fName" placeholder="Full name" />
+            </div>
+            <div class="m-group">
+                <label class="m-label">Email Address *</label>
+                <input class="m-input" id="fEmail" type="email" placeholder="email@example.com" />
+            </div>
+            <div class="m-group">
+                <label class="m-label">Phone</label>
+                <input class="m-input" id="fPhone" placeholder="07X XXX XXXX" />
+            </div>
+            <div class="m-group" id="orgNameGroup" style="display:none;">
+                <label class="m-label">Organization Name</label>
+                <input class="m-input" id="fOrgName" placeholder="Name of organization" />
+            </div>
+            <div class="m-row">
+                <div class="m-group">
+                    <label class="m-label">Password *</label>
+                    <input class="m-input" id="fPassword" type="password" placeholder="••••••••" />
+                </div>
+                <div class="m-group">
+                    <label class="m-label">Confirm Password *</label>
+                    <input class="m-input" id="fConfirm" type="password" placeholder="••••••••" />
+                </div>
+            </div>
+            <button class="m-submit" onclick="submitAccount()">Create Account →</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const API = 'https://localhost:7096/api';
+        const adminRole = '@Model.UserRole';
+        if (adminRole !== 'Admin') window.location.href = '/Login';
+
+        let currentRole = 'Citizen';
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            btn.classList.add('active');
+            if (id === 'citizens') loadCitizens();
+            if (id === 'organizers') loadOrganizers();
+        }
+
+        function setRole(role, btn) {
+            currentRole = role;
+            document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            const descs = {
+                Citizen: 'Citizens can browse and register for events on the platform.',
+                Organizer: 'Organizers can create and manage their own events on the platform.'
+            };
+            document.getElementById('roleDesc').textContent = descs[role];
+            document.getElementById('orgNameGroup').style.display = role === 'Organizer' ? 'block' : 'none';
+        }
+
+        function initials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        function formatDate(d) {
+            if (!d) return '—';
+            return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        async function loadCitizens() {
+            const tbody = document.getElementById('citizensBody');
+            tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Loading...</td></tr>`;
+            try {
+                const res = await fetch(`${API}/admin/participants`);
+                const data = await res.json();
+                if (!data.length) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No citizens found.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = data.map(p => `
+                    <tr>
+                        <td><span class="avatar">${initials(p.fullName)}</span><strong>${p.fullName || '—'}</strong></td>
+                        <td>${p.email || '—'}</td>
+                        <td>${p.phone || '—'}</td>
+                        <td><button class="action-btn" onclick="deleteCitizen(${p.id}, this)">🗑 Delete</button></td>
+                    </tr>
+                `).join('');
+            } catch {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#dc2626;padding:2rem">Error loading citizens. Is the API running?</td></tr>`;
+            }
+        }
+
+        async function loadOrganizers() {
+            const tbody = document.getElementById('organizersBody');
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Loading...</td></tr>`;
+            try {
+                const res = await fetch(`${API}/admin/organizers`);
+                const data = await res.json();
+                if (!data.length) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No organizers found.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = data.map(o => `
+                    <tr>
+                        <td><span class="avatar">${initials(o.fullName)}</span><strong>${o.fullName || '—'}</strong></td>
+                        <td>${o.email || '—'}</td>
+                        <td>${o.phone || '—'}</td>
+                        <td>${o.organizationName || '—'}</td>
+                        <td><button class="action-btn" onclick="deleteOrganizer(${o.id}, this)">🗑 Delete</button></td>
+                    </tr>
+                `).join('');
+            } catch {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#dc2626;padding:2rem">Error loading organizers. Is the API running?</td></tr>`;
+            }
+        }
+
+        async function deleteCitizen(id, btn) {
+            if (!confirm('Delete this citizen? This cannot be undone.')) return;
+            btn.disabled = true;
+            btn.textContent = 'Deleting...';
+            const res = await fetch(`${API}/admin/participant/${id}`, { method: 'DELETE' });
+            if (res.ok) loadCitizens();
+            else { alert('Failed to delete citizen.'); btn.disabled = false; btn.textContent = '🗑 Delete'; }
+        }
+
+        async function deleteOrganizer(id, btn) {
+            if (!confirm('Delete this organizer? This cannot be undone.')) return;
+            btn.disabled = true;
+            btn.textContent = 'Deleting...';
+            const res = await fetch(`${API}/admin/organizer/${id}`, { method: 'DELETE' });
+            if (res.ok) loadOrganizers();
+            else { alert('Failed to delete organizer.'); btn.disabled = false; btn.textContent = '🗑 Delete'; }
+        }
+
+        async function submitAccount() {
+            const msgEl = document.getElementById('formMsg');
+            msgEl.innerHTML = '';
+
+            const name = document.getElementById('fName').value.trim();
+            const email = document.getElementById('fEmail').value.trim();
+            const password = document.getElementById('fPassword').value;
+            const confirm = document.getElementById('fConfirm').value;
+            const phone = document.getElementById('fPhone').value.trim();
+            const orgName = document.getElementById('fOrgName').value.trim();
+
+            if (!name || !email || !password || !confirm) {
+                msgEl.innerHTML = `<div class="m-error">Please fill in all required fields.</div>`;
+                return;
+            }
+            if (password.length < 6) {
+                msgEl.innerHTML = `<div class="m-error">Password must be at least 6 characters.</div>`;
+                return;
+            }
+            if (password !== confirm) {
+                msgEl.innerHTML = `<div class="m-error">Passwords do not match.</div>`;
+                return;
+            }
+
+            const payload = currentRole === 'Organizer'
+                ? { fullName: name, email, password, phone, organizationName: orgName }
+                : { fullName: name, email, password, phone };
+
+            const endpoint = currentRole === 'Organizer'
+                ? `${API}/admin/addorganizer`
+                : `${API}/admin/addparticipant`;
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    msgEl.innerHTML = `<div class="m-success">✓ ${currentRole} account created successfully!</div>`;
+                    ['fName','fEmail','fPhone','fPassword','fConfirm','fOrgName']
+                        .forEach(id => document.getElementById(id).value = '');
+                } else {
+                    const err = await res.text();
+                    msgEl.innerHTML = `<div class="m-error">${err || 'Failed to create account.'}</div>`;
+                }
+            } catch {
+                msgEl.innerHTML = `<div class="m-error">Network error. Is the API running?</div>`;
+            }
+        }
+
+        loadCitizens();
+    </script>
+}
