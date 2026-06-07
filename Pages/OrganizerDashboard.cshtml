@@ -1,0 +1,747 @@
+﻿@page
+@model KMC_Main_WEB.Pages.OrganizerDashboardModel
+@{
+    ViewData["Title"] = "Organizer Dashboard";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --kmc-blue: #1a56db;
+            --kmc-blue-dark: #1e429f;
+            --kmc-blue-light: #e8f0fe;
+            --kmc-accent: #0ea5e9;
+        }
+
+        .dash-page {
+            padding: 2.5rem 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dash-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+            .dash-header h1 {
+                font-size: clamp(1.6rem, 3vw, 2.2rem);
+                font-weight: 800;
+                color: #0f172a;
+                margin: 0;
+            }
+
+            .dash-header p {
+                color: #64748b;
+                font-size: 0.88rem;
+                margin-top: 4px;
+                margin-bottom: 0;
+            }
+
+        .new-event-btn {
+            background: var(--kmc-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+            .new-event-btn:hover {
+                background: var(--kmc-blue-dark);
+            }
+
+        /* TABS */
+        .dash-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 1.75rem;
+        }
+
+        .dash-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #64748b;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: -2px;
+        }
+
+            .dash-tab:hover {
+                color: var(--kmc-blue);
+            }
+
+            .dash-tab.active {
+                color: var(--kmc-blue);
+                border-bottom-color: var(--kmc-blue);
+            }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        /* TABLE */
+        .table-wrap {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(26,86,219,0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8faff;
+            padding: 0.85rem 1.2rem;
+            text-align: left;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            font-size: 0.875rem;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8faff;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .pill-active {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .pill-upcoming {
+            background: var(--kmc-blue-light);
+            color: var(--kmc-blue);
+        }
+
+        .pill-ended {
+            background: #f1f5f9;
+            color: #94a3b8;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1.5px solid #bfdbfe;
+            color: var(--kmc-blue);
+            padding: 5px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 6px;
+        }
+
+            .action-btn:hover {
+                background: var(--kmc-blue-light);
+            }
+
+            .action-btn.delete {
+                border-color: #fecaca;
+                color: #dc2626;
+            }
+
+                .action-btn.delete:hover {
+                    background: #fef2f2;
+                }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.6);
+            /* backdrop-filter: blur(4px); */
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s;
+        }
+
+            .modal-overlay.open {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .modal {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(16px);
+            transition: transform 0.25s;
+            box-shadow: 0 20px 60px rgba(26,86,219,0.15);
+        }
+
+        .modal-overlay.open .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+            .modal-header h3 {
+                font-size: 1.2rem;
+                font-weight: 800;
+                color: #0f172a;
+                margin: 0;
+            }
+
+        .modal-close {
+            background: #f1f5f9;
+            border: none;
+            color: #64748b;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+            .modal-close:hover {
+                background: #fee2e2;
+                color: #dc2626;
+            }
+
+        .m-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .m-label {
+            display: block;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 0.4rem;
+        }
+
+        .m-input {
+            width: 100%;
+            background: #f8faff;
+            border: 1.5px solid #e2e8f0;
+            color: #0f172a;
+            padding: 0.75rem 1rem;
+            font-size: 0.88rem;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+            .m-input:focus {
+                border-color: var(--kmc-blue);
+                background: white;
+                box-shadow: 0 0 0 3px rgba(26,86,219,0.08);
+            }
+
+            .m-input::placeholder {
+                color: #94a3b8;
+            }
+
+        .m-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .m-submit {
+            width: 100%;
+            background: var(--kmc-blue);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+            .m-submit:hover {
+                background: var(--kmc-blue-dark);
+            }
+
+        .m-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 0.75rem 1rem;
+            font-size: 0.82rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .image-upload-btn {
+            background: #f8faff;
+            border: 1.5px dashed #bfdbfe;
+            color: var(--kmc-blue);
+            padding: 0.75rem 1.25rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+            .image-upload-btn:hover {
+                background: var(--kmc-blue-light);
+                border-style: solid;
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        @@media (max-width: 768px) {
+            .dash-page {
+                padding: 1.5rem 1rem 3rem;
+            }
+
+            .m-row {
+                grid-template-columns: 1fr;
+            }
+
+            td, th {
+                padding: 0.75rem 0.85rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+}
+
+<div class="dash-page">
+
+    <div class="dash-header">
+        <div>
+            <h1>Organizer Dashboard</h1>
+            <p>Welcome back, <strong style="color:var(--kmc-blue)">@Model.UserName</strong></p>
+        </div>
+        <button class="new-event-btn" onclick="openModal('create')">+ New Event</button>
+    </div>
+
+    <div class="dash-tabs">
+        <button class="dash-tab active" onclick="switchTab('my-events', this)">My Events</button>
+        <button class="dash-tab" onclick="switchTab('registrations', this)">Registrations</button>
+    </div>
+
+  
+    <div id="tab-my-events" class="tab-content active">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="myEventsBody">
+                    <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+  
+    <div id="eventForm" style="display:none; margin-top:2rem;">
+        <div style="background:white; border:1px solid #e2e8f0; border-radius:12px; padding:2rem; box-shadow:0 2px 12px rgba(26,86,219,0.06);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid #e2e8f0;">
+                <h3 id="formTitle" style="font-size:1.2rem; font-weight:800; color:#0f172a; margin:0;">New Event</h3>
+                <button onclick="closeForm()" style="background:#f1f5f9; border:none; color:#64748b; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:1rem;">✕</button>
+            </div>
+            <div id="formError"></div>
+            <input type="hidden" id="editEventId" />
+
+            <div class="m-group">
+                <label class="m-label">Event Title *</label>
+                <input class="m-input" id="fTitle" placeholder="e.g. Kandy Cultural Night" />
+            </div>
+            <div class="m-row">
+                <div class="m-group">
+                    <label class="m-label">Type *</label>
+                    <select class="m-input" id="fType">
+                        <option value="">All Events</option>
+                        <option value="Arts & Crafts">🎨 Arts & Crafts</option>
+                        <option value=" Eco & Sustainability">🌿 Eco & Sustainability</option>
+                        <option value="Wellness & Mindfulness">🧘 Wellness & Mindfulness</option>
+                        <option value="Gaming & Esports">🎮 Gaming & Esports</option>
+                        <option value="Science & Technology">🚀 Science & Technology</option>
+                        <option value="Comedy & Stand-up">🎤 Comedy & Stand-up</option>
+                        <option value="Adventure & Outdoors">🚲 Adventure & Outdoors</option>
+                    </select>
+                </div>
+                <div class="m-group">
+                    <label class="m-label">Capacity *</label>
+                    <input class="m-input" id="fCapacity" type="number" placeholder="100" min="1" />
+                </div>
+            </div>
+            <div class="m-group">
+                <label class="m-label">Location *</label>
+                <input class="m-input" id="fLocation" placeholder="e.g. Kandy City Centre" />
+            </div>
+            <div class="m-row">
+                <div class="m-group">
+                    <label class="m-label">Start Date & Time *</label>
+                    <input class="m-input" id="fStartDate" type="datetime-local" />
+                </div>
+                <div class="m-group">
+                    <label class="m-label">End Date & Time</label>
+                    <input class="m-input" id="fEndDate" type="datetime-local" />
+                </div>
+            </div>
+            <div class="m-group">
+                <label class="m-label">Event Image</label>
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                    <input type="file" id="fImageFile" accept="image/*" style="display:none;" onchange="handleImageSelect(this)" />
+                    <button type="button" class="image-upload-btn" onclick="document.getElementById('fImageFile').click()">📸 Choose Image</button>
+                    <span id="selectedFileName" style="font-size:0.82rem; color:#64748b;"></span>
+                </div>
+                <div id="imagePreviewContainer" style="margin-top:10px; display:none;">
+                    <img id="imagePreview" style="max-width:100%; max-height:180px; border-radius:8px; border:1px solid #e2e8f0;" />
+                </div>
+            </div>
+            <div class="m-group">
+                <label class="m-label">Description</label>
+                <textarea class="m-input" id="fDesc" rows="3" placeholder="Describe your event..."></textarea>
+            </div>
+            <div style="display:flex; gap:1rem;">
+                <button class="m-submit" onclick="submitEvent()" style="flex:1;">Save Event →</button>
+                <button onclick="closeForm()" style="padding:0.9rem 1.5rem; background:#f1f5f9; border:none; border-radius:8px; cursor:pointer; font-weight:600; color:#64748b;">Cancel</button>
+            </div>
+        </div>
+    </div>
+   
+    <div id="tab-registrations" class="tab-content">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Email</th>
+                        <th>Event</th>
+                        <th>Registered On</th>
+                    </tr>
+                </thead>
+                <tbody id="regsBody">
+                    <tr><td colspan="4" class="empty-state">Click the tab to load registrations.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <script>
+        const API = 'https://localhost:7096/api';
+        const orgId = parseInt('@Model.UserId') || 0;
+        const orgRole = '@Model.UserRole';
+
+        if (!orgRole || orgRole !== 'Organizer') window.location.href = '/Login';
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            btn.classList.add('active');
+            if (id === 'registrations') loadRegistrations();
+        }
+
+        function openModal(mode, ev) {
+            document.getElementById('formError').innerHTML = '';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('selectedFileName').textContent = '';
+            document.getElementById('fImageFile').value = '';
+
+            if (mode === 'create') {
+                document.getElementById('formTitle').textContent = 'New Event';
+                document.getElementById('editEventId').value = '';
+                ['fTitle','fType','fCapacity','fLocation','fStartDate','fEndDate','fDesc']
+                    .forEach(id => document.getElementById(id).value = '');
+            } else {
+                document.getElementById('formTitle').textContent = 'Edit Event';
+                document.getElementById('editEventId').value = ev.id;
+                document.getElementById('fTitle').value = ev.title || '';
+                document.getElementById('fType').value = ev.type || '';
+                document.getElementById('fCapacity').value = ev.capacity || '';
+                document.getElementById('fLocation').value = ev.location || '';
+                document.getElementById('fStartDate').value = ev.startDate?.slice(0,16) || '';
+                document.getElementById('fEndDate').value = ev.endDate?.slice(0,16) || '';
+                document.getElementById('fDesc').value = ev.description || '';
+                if (ev.eventImage) {
+                    document.getElementById('imagePreview').src = `https://localhost:7096${ev.eventImage}`;
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                    document.getElementById('selectedFileName').textContent = 'Current image';
+                }
+            }
+
+            document.getElementById('eventForm').style.display = 'block';
+            document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeForm() {
+            document.getElementById('eventForm').style.display = 'none';
+        }
+
+        async function editEvent(id) {
+            try {
+                const res = await fetch(`${API}/event/${id}`);
+                if (!res.ok) throw new Error();
+                const ev = await res.json();
+                openModal('edit', ev);
+            } catch {
+                alert('Failed to load event details.');
+            }
+        }
+
+        function getStatus(startDate, endDate) {
+            const now = new Date();
+            const start = new Date(startDate);
+            const end = endDate ? new Date(endDate) : null;
+            if (end) {
+                const hide = new Date(end);
+                hide.setDate(hide.getDate() + 1);
+                if (now > hide) return 'hidden';
+                if (now > end) return 'ended';
+            }
+            if (now < start) return 'upcoming';
+            return 'active';
+        }
+
+        function formatDate(d) {
+            if (!d) return '—';
+            return new Date(d).toLocaleDateString('en-GB',
+                { day:'numeric', month:'short', year:'numeric' });
+        }
+
+        async function loadMyEvents() {
+            const tbody = document.getElementById('myEventsBody');
+            if (!orgId) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Please log in as Organizer.</td></tr>`;
+                return;
+            }
+            try {
+                const res = await fetch(`${API}/event/organizer/${orgId}`);
+                const events = await res.json();
+                if (!events.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">You haven't created any events yet.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = events.map(ev => {
+                    const s = getStatus(ev.startDate, ev.endDate);
+                    if (s === 'hidden') return '';
+                    const pillClass = s === 'active' ? 'pill-active' : s === 'upcoming' ? 'pill-upcoming' : 'pill-ended';
+                    return `<tr>
+                        <td><strong>${ev.title}</strong></td>
+                        <td>${ev.type || 'General'}</td>
+                        <td>${formatDate(ev.startDate)}</td>
+                        <td>${ev.currentParticipants || 0} / ${ev.capacity}</td>
+                        <td><span class="status-pill ${pillClass}">${s}</span></td>
+                        <td>
+                            <button onclick="editEvent(${ev.id})" class="action-btn">Edit</button>
+                            <button onclick="deleteEvent(${ev.id})" class="action-btn delete">Delete</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#dc2626;padding:2rem">Error loading events. Is the API running?</td></tr>`;
+            }
+        }
+
+               
+        async function loadRegistrations() {
+            const tbody = document.getElementById('regsBody');
+            tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Loading registrations...</td></tr>`;
+
+            try {
+            
+                const res = await fetch(`${API}/eventregistration/organizer/${orgId}`);
+
+                if (!res.ok) {
+                    throw new Error('Failed to load registrations');
+                }
+
+                const registrations = await res.json();
+
+                if (!registrations || registrations.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No one has registered for your events yet.</td></tr>`;
+                    return;
+                }
+
+               
+                tbody.innerHTML = registrations.map(r => `
+                    <tr>
+                        <td><strong>${r.participantName || '—'}</strong></td>
+                        <td>${r.participantEmail || '—'}</td>
+                        <td>${r.eventTitle || '—'}</td>
+                        <td>${formatDate(r.registeredAt)}</td>
+                    </tr>
+                `).join('');
+
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#dc2626;padding:1.5rem">
+                    Failed to load your event registrations.<br>
+                    <small>Please make sure the API is running.</small>
+                </td></tr>`;
+            }
+        }
+
+                async function submitEvent() {
+            const errEl = document.getElementById('formError');
+            errEl.innerHTML = '';
+
+            const title = document.getElementById('fTitle').value.trim();
+            const type = document.getElementById('fType').value;
+            const capacity = parseInt(document.getElementById('fCapacity').value);
+            const location = document.getElementById('fLocation').value.trim();
+            const startDate = document.getElementById('fStartDate').value;
+
+            if (!title || !type || !capacity || !location || !startDate) {
+                errEl.innerHTML = `<div class="m-error">Please fill in all required fields.</div>`;
+                return;
+            }
+
+            const editId = document.getElementById('editEventId').value;
+            const formData = new FormData();
+
+            formData.append('title', title);
+            formData.append('type', type);
+            formData.append('capacity', capacity);
+            formData.append('location', location);
+            formData.append('startDate', startDate);
+
+            const endDateVal = document.getElementById('fEndDate').value;
+            if (endDateVal) formData.append('endDate', endDateVal);
+
+            formData.append('description', document.getElementById('fDesc').value || '');
+            formData.append('organizerId', orgId);
+            formData.append('status', 'Active');
+
+            
+            formData.append('eventPlatform', 'KMC');
+            
+
+            const imageFile = document.getElementById('fImageFile').files[0];
+            if (imageFile) formData.append('eventImageFile', imageFile);
+
+            try {
+                const res = await fetch(
+                    editId ? `${API}/event/${editId}` : `${API}/event`,
+                    {
+                        method: editId ? 'PUT' : 'POST',
+                        body: formData
+                    }
+                );
+
+                if (res.ok) {
+                    closeForm();
+                    loadMyEvents();
+                    alert(editId ? 'Event updated successfully!' : 'Event created successfully!');
+                } else {
+                    const err = await res.text();
+                    errEl.innerHTML = `<div class="m-error">${err || 'Failed to save event.'}</div>`;
+                }
+            } catch {
+                errEl.innerHTML = `<div class="m-error">Network error. Is the API running?</div>`;
+            }
+        }
+
+        async function deleteEvent(id) {
+            if (!confirm('Delete this event? This cannot be undone.')) return;
+            const res = await fetch(`${API}/event/${id}`, { method: 'DELETE' });
+            if (res.ok) loadMyEvents();
+            else alert('Failed to delete event.');
+        }
+
+        function handleImageSelect(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('selectedFileName').textContent = input.files[0].name;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        loadMyEvents();
+    </script>
+}

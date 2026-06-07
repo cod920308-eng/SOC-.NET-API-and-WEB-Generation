@@ -1,0 +1,680 @@
+﻿@page
+@model KMC_Main_WEB.Pages.EventsModel
+@{
+    ViewData["Title"] = "Events";
+}
+
+<style>
+    :root {
+        --kmc-blue: #1a56db;
+        --kmc-blue-dark: #1e429f;
+        --kmc-blue-light: #e8f0fe;
+        --kmc-accent: #0ea5e9;
+    }
+
+    .events-hero {
+        background: linear-gradient(135deg, #1e429f 0%, #1a56db 50%, #0ea5e9 100%);
+        padding: 4rem 0 3rem;
+        color: white;
+        margin-bottom: 2rem;
+    }
+
+        .events-hero h1 {
+            font-size: clamp(2rem,4vw,3rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .events-hero p {
+            opacity: 0.85;
+            font-size: 1rem;
+        }
+
+    .search-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 24px rgba(26,86,219,0.12);
+        margin-bottom: 2rem;
+        border: 1px solid #e8f0fe;
+    }
+
+    .search-input-wrap {
+        position: relative;
+    }
+
+        .search-input-wrap input {
+            padding-left: 2.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            height: 44px;
+            transition: border-color 0.2s;
+        }
+
+            .search-input-wrap input:focus {
+                border-color: var(--kmc-blue);
+                box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+                outline: none;
+            }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .filter-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        height: 44px;
+        padding: 0 1rem;
+        transition: border-color 0.2s;
+        background: white;
+        cursor: pointer;
+    }
+
+        .filter-select:focus {
+            border-color: var(--kmc-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+        }
+
+    .btn-clear {
+        background: transparent;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        height: 44px;
+        padding: 0 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .btn-clear:hover {
+            border-color: var(--kmc-blue);
+            color: var(--kmc-blue);
+        }
+
+    .results-info {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .results-info span {
+            color: var(--kmc-blue);
+            font-weight: 600;
+        }
+
+    .category-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .cat-tab {
+        background: white;
+        border: 2px solid #e2e8f0;
+        color: #64748b;
+        border-radius: 100px;
+        padding: 6px 18px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .cat-tab:hover {
+            border-color: var(--kmc-blue);
+            color: var(--kmc-blue);
+        }
+
+        .cat-tab.active {
+            background: var(--kmc-blue);
+            border-color: var(--kmc-blue);
+            color: white;
+        }
+
+    .no-results {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #94a3b8;
+        display: none;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        transition: transform 0.25s, box-shadow 0.25s;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(26,86,219,0.15);
+        }
+
+    .event-card-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .event-card-img-placeholder {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(135deg, #e8f0fe 0%, #dbeafe 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .event-card-body {
+        padding: 1.25rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .event-type-badge {
+        display: inline-block;
+        background: var(--kmc-blue-light);
+        color: var(--kmc-blue);
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 3px 10px;
+        border-radius: 100px;
+        margin-bottom: 0.6rem;
+    }
+
+    .event-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+
+    .event-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .event-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.82rem;
+        color: #64748b;
+    }
+
+    .event-meta-label {
+        font-weight: 600;
+        color: #475569;
+        min-width: 110px;
+        font-size: 0.78rem;
+    }
+
+    .event-meta-value {
+        color: #64748b;
+        font-size: 0.82rem;
+    }
+
+    .event-meta-icon {
+        width: 16px;
+        text-align: center;
+    }
+
+    .capacity-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+
+    .capacity-bar {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 100px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .capacity-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--kmc-blue), var(--kmc-accent));
+        border-radius: 100px;
+        transition: width 0.5s ease;
+    }
+
+        .capacity-fill.full {
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+        }
+
+    .event-card-footer {
+        margin-top: auto;
+    }
+
+    .btn-register {
+        width: 100%;
+        background: var(--kmc-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-register:hover {
+            background: var(--kmc-blue-dark);
+        }
+
+        .btn-register:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-register.registered {
+            background: #dcfce7;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+            cursor: default;
+        }
+
+    .btn-login-register {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: transparent;
+        border: 2px solid var(--kmc-blue);
+        color: var(--kmc-blue);
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .btn-login-register:hover {
+            background: var(--kmc-blue);
+            color: white;
+        }
+
+    .ended-badge {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: #f1f5f9;
+        color: #94a3b8;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+
+    .dot-active {
+        background: #16a34a;
+    }
+
+    .dot-upcoming {
+        background: #1a56db;
+    }
+
+    .dot-ended {
+        background: #94a3b8;
+    }
+
+    .no-events {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 5rem 2rem;
+        color: #94a3b8;
+    }
+
+        .no-events h3 {
+            color: #1e293b;
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+    .status-toast {
+        text-align: center;
+        padding: 0.85rem 1.2rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .toast-success {
+        background: #dcfce7;
+        border: 1px solid #bbf7d0;
+        color: #16a34a;
+    }
+
+    .toast-error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+    }
+</style>
+
+<!-- HERO -->
+<div class="events-hero">
+    <div class="container">
+        <h1>🎪 Kandy City Events</h1>
+        <p>Discover and register for events happening across the city</p>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- SEARCH SECTION -->
+    <div class="search-section">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="search-input-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="form-control"
+                           placeholder="Search events..." oninput="filterEvents()" />
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select id="filterType" class="filter-select w-100" onchange="filterEvents()">
+                    <option value="">All Types</option>
+                    @foreach (var t in Model.Events
+                                        .Where(e => !string.IsNullOrEmpty(e.type))
+                                        .Select(e => e.type!).Distinct().OrderBy(t => t))
+                    {
+                        <option value="@t">@t</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" id="filterDate" class="filter-select w-100"
+                       onchange="filterEvents()" />
+            </div>
+            <div class="col-md-2">
+                <select id="filterStatus" class="filter-select w-100" onchange="filterEvents()">
+                    <option value="">All Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="active">Active</option>
+                    <option value="ended">Ended</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn-clear w-100" onclick="clearFilters()">✕ Clear</button>
+            </div>
+        </div>
+    </div>
+
+   <h3>Event Categories Done by KMC Events</h3>
+    <div class="category-tabs" id="catTabs">
+        <button class="cat-tab active" onclick="setCat('', this)">All Events</button>
+        <button class="cat-tab" onclick="setCat('Arts & Crafts', this)">🎨 Arts & Crafts</button>
+        <button class="cat-tab" onclick="setCat('Eco & Sustainability', this)">🌿 Eco & Sustainability</button>
+        <button class="cat-tab" onclick="setCat('Wellness & Mindfulness', this)">🧘 Wellness & Mindfulness</button>
+        <button class="cat-tab" onclick="setCat('Gaming & Esports', this)">🎮 Gaming & Esports</button>
+        <button class="cat-tab" onclick="setCat('Science & Technology', this)">🚀 Science & Technology</button>
+        <button class="cat-tab" onclick="setCat('Comedy & Stand-up', this)">🎤 Comedy & Stand-up</button>
+        <button class="cat-tab" onclick="setCat('AAdventure & Outdoors', this)">🚲 Adventure & Outdoors</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <div class="status-toast @(Model.IsSuccess ? "toast-success" : "toast-error")">
+            @Model.StatusMessage
+        </div>
+    }
+
+    <p class="results-info" id="resultsCount">
+        Showing <span>@Model.Events.Count</span> event@(Model.Events.Count != 1 ? "s" : "")
+    </p>
+
+    <div class="no-results" id="noResults">
+        <h3>No Events Found</h3>
+        <p>Try adjusting your filters.</p>
+    </div>
+
+    @if (Model.Events.Any())
+    {
+        <div class="events-grid" id="eventsGrid">
+            @foreach (var ev in Model.Events)
+            {
+                var now = DateTime.Now;
+                var status = now < ev.startDate ? "upcoming"
+                : now > ev.endDate ? "ended"
+                : "active";
+                var pct = ev.capacity > 0
+                ? Math.Min(100, (int)Math.Round((double)ev.currentParticipants / ev.capacity * 100))
+                : 0;
+                var isFull = ev.currentParticipants >= ev.capacity;
+                var isEnded = status == "ended";
+                var registered = Model.RegisteredEventIds.Contains(ev.id);
+
+                <div class="event-card"
+                     data-title="@ev.title?.ToLower()"
+                     data-type="@ev.type?.ToLower()"
+                     data-date="@ev.startDate.ToString("yyyy-MM-dd")"
+                     data-status="@status">
+
+                    @if (!string.IsNullOrEmpty(ev.eventImage))
+                    {
+                        <img class="event-card-img"
+                             src="https://localhost:7096/@ev.eventImage.TrimStart('/')"
+                             alt="@ev.title"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                        <div class="event-card-img-placeholder" style="display:none">🎪</div>
+                    }
+                    else
+                    {
+                        <div class="event-card-img-placeholder">🎪</div>
+                    }
+
+                    <div class="event-card-body">
+                        <span class="event-type-badge">@(ev.type ?? "General")</span>
+                        <h3 class="event-card-title">@ev.title</h3>
+
+                        <div class="event-meta">
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">📅 Start Date:</span>
+                                <span class="event-meta-value">@ev.startDate.ToString("dd MMM yyyy")</span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">🕐 Start Time:</span>
+                                <span class="event-meta-value">@ev.startDate.ToString("hh:mm tt")</span>
+                            </div>
+                            @if (ev.endDate != ev.startDate)
+                            {
+                                <div class="event-meta-row">
+                                    <span class="event-meta-label">📅 End Date:</span>
+                                    <span class="event-meta-value">@ev.endDate.ToString("dd MMM yyyy")</span>
+                                </div>
+                                <div class="event-meta-row">
+                                    <span class="event-meta-label">🕐 End Time:</span>
+                                    <span class="event-meta-value">@ev.endDate.ToString("hh:mm tt")</span>
+                                </div>
+                            }
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">📍 Location:</span>
+                                <span class="event-meta-value">@(ev.location ?? "Kandy, Sri Lanka")</span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">👤 Organizer:</span>
+                                <span class="event-meta-value">
+                                    @(ev.organizer?.organizationName ?? ev.organizer?.fullName ?? ev.organizerName ?? "—")
+                                </span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">🔵 Status:</span>
+                                <span class="event-meta-value">
+                                    @if (status == "active")
+                                    {
+                                        <span class="status-dot dot-active"></span>
+                            
+                                        <text>Active</text>
+                                    }
+                                    else if (status == "upcoming")
+                                    {
+                                        <span class="status-dot dot-upcoming"></span>
+                            
+                                        <text>Upcoming</text>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-dot dot-ended"></span>
+                            
+                                        <text>Ended</text>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="capacity-row">
+                            <span>Capacity</span>
+                            <span>@ev.currentParticipants / @ev.capacity</span>
+                        </div>
+                        <div class="capacity-bar">
+                            <div class="capacity-fill @(isFull ? "full" : "")"
+                                 style="width:@pct%"></div>
+                        </div>
+
+                        <div class="event-card-footer">
+                            @if (isEnded)
+                            {
+                                <span class="ended-badge">Event Ended</span>
+                            }
+                            else if (Model.UserRole == "Organizer" || Model.UserRole == "Admin")
+                            {
+                                <button class="btn-register" disabled style="opacity:.5">Organizer View</button>
+                            }
+                            else if (registered)
+                            {
+                                <button class="btn-register registered" disabled>✓ Registered</button>
+                            }
+                            else if (isFull)
+                            {
+                                <button class="btn-register" disabled>Fully Booked</button>
+                            }
+                            else if (Model.UserRole == "Citizen")
+                            {
+                                <form method="post" asp-page-handler="Register">
+                                    <input type="hidden" name="eventId" value="@ev.id" />
+                                    <button type="submit" class="btn-register">Register Now →</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a href="/Login" class="btn-login-register">Login to Register</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="events-grid">
+            <div class="no-events">
+                <h3>No Events Found</h3>
+                <p>Make sure the API is running.</p>
+            </div>
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <script>
+        let activeCat = '';
+
+        function filterEvents() {
+            const q      = document.getElementById('searchInput').value.toLowerCase();
+            const type   = document.getElementById('filterType').value.toLowerCase();
+            const date   = document.getElementById('filterDate').value;
+            const status = document.getElementById('filterStatus').value;
+
+            const cards = document.querySelectorAll('#eventsGrid .event-card');
+            let visible = 0;
+
+            cards.forEach(card => {
+                const matchQ      = !q         || (card.dataset.title || '').includes(q);
+                const matchType   = !type      || card.dataset.type === type;
+                const matchCat    = !activeCat || card.dataset.type === activeCat.toLowerCase();
+                const matchDate   = !date      || card.dataset.date === date;
+                const matchStatus = !status    || card.dataset.status === status;
+                const show = matchQ && matchType && matchCat && matchDate && matchStatus;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            const total = cards.length;
+            document.getElementById('resultsCount').innerHTML =
+                (q || type || date || status || activeCat)
+                ? `Showing <span>${visible}</span> of <span>${total}</span> events`
+                : `Showing <span>${total}</span> event${total !== 1 ? 's' : ''}`;
+
+            document.getElementById('noResults').style.display =
+                visible === 0 ? 'block' : 'none';
+        }
+
+        function setCat(cat, btn) {
+            activeCat = cat;
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            filterEvents();
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value  = '';
+            document.getElementById('filterType').value   = '';
+            document.getElementById('filterDate').value   = '';
+            document.getElementById('filterStatus').value = '';
+            activeCat = '';
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.cat-tab').classList.add('active');
+            filterEvents();
+        }
+    </script>
+}

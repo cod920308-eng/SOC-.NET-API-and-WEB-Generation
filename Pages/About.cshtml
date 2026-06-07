@@ -1,0 +1,249 @@
+﻿@page
+@model KMC_Main_WEB.Pages.AboutModel
+@{
+    ViewData["Title"] = "About";
+}
+
+<style>
+    :root {
+        --kmc-blue: #1a56db;
+        --kmc-blue-dark: #1e429f;
+        --kmc-blue-light: #e8f0fe;
+    }
+
+    /* HERO */
+    .about-hero {
+        background: linear-gradient(135deg, #1e429f 0%, #1a56db 60%, #0ea5e9 100%);
+        padding: 4rem 0 3rem;
+        color: white;
+        text-align: center;
+    }
+
+        .about-hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-hero p {
+            opacity: 0.85;
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+    /* SECTIONS */
+    .about-section {
+        padding: 5rem 0;
+    }
+
+        .about-section.gray {
+            background: #f8faff;
+        }
+
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--kmc-blue);
+        margin-bottom: 8px;
+    }
+
+    .section-title {
+        font-size: clamp(1.5rem, 3vw, 2.1rem);
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+
+    .section-body {
+        font-size: 0.95rem;
+        color: #475569;
+        line-height: 1.8;
+        margin-bottom: 1rem;
+    }
+
+    /* IMAGE */
+    .about-img-wrap {
+        border-radius: 16px;
+        overflow: hidden;
+        height: 400px;
+    }
+
+        .about-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    /* STAT CARDS */
+    .stat-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.25s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(26,86,219,0.1);
+            border-color: #bfdbfe;
+        }
+
+        .stat-card .num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--kmc-blue);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .lbl {
+            font-size: 0.82rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+    /* MISSION CARDS */
+    .mission-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        height: 100%;
+    }
+
+    .mission-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .mission-card h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.4rem;
+    }
+
+    .mission-card p {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.65;
+        margin: 0;
+    }
+</style>
+
+<!-- HERO -->
+<div class="about-hero">
+    <div class="container">
+        <h1>About KMC Events</h1>
+        <p>Connecting the people of Kandy with their city's most vibrant moments</p>
+    </div>
+</div>
+
+<!-- ABOUT SECTION -->
+<section class="about-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="about-img-wrap">
+                    <img src="/Images/bahirawakanda.jpg"
+                         alt="Kandy City" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="section-label">Who We Are</div>
+                <h2 class="section-title">Kandy Municipal Council Event Platform</h2>
+                <p class="section-body">
+                    The Kandy Municipal Council (KMC) is the governing body of Kandy city,
+                    one of Sri Lanka's most historically and culturally significant cities.
+                    This platform is the official digital hub for all civic events organised
+                    or endorsed by the KMC.
+                </p>
+                <p class="section-body">
+                    From the world-renowned Esala Perahera to community sports days,
+                    educational programmes and cultural festivals — we bring every event
+                    to your fingertips. Our goal is simple: make it easy for every resident
+                    and visitor to discover, register, and participate in the life of the city.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="about-section gray">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <div class="section-label">By The Numbers</div>
+                <h2 class="section-title">Kandy in figures</h2>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="num">50+</div>
+                    <div class="lbl">Events Per Year</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="num">10K+</div>
+                    <div class="lbl">Participants</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="num">8</div>
+                    <div class="lbl">Event Categories</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="num">2500+</div>
+                    <div class="lbl">Years of History</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MISSION -->
+<section class="about-section">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <div class="section-label">What We Stand For</div>
+                <h2 class="section-title">Our Mission</h2>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="mission-card">
+                    <div class="mission-icon">🏛️</div>
+                    <h5>Civic Engagement</h5>
+                    <p>Bringing residents closer to their city through organised, transparent and accessible public events.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mission-card">
+                    <div class="mission-icon">🎭</div>
+                    <h5>Cultural Preservation</h5>
+                    <p>Celebrating and safeguarding Kandy's rich heritage — from Kandyan dance to sacred religious processions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mission-card">
+                    <div class="mission-icon">🤝</div>
+                    <h5>Community First</h5>
+                    <p>Every event we host is designed to foster unity, inclusivity and a shared sense of pride in our city.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
