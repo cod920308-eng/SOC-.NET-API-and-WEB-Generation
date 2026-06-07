@@ -1,0 +1,819 @@
+﻿@page
+@model PrivateWeb.Pages.OrganizerDashboardModel
+@{
+    ViewData["Title"] = "Organizer Dashboard";
+}
+
+@section Styles {
+    <style>
+        .dash-page {
+            padding: 6rem 4rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dash-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+            .dash-header h1 {
+                font-family: 'Playfair Display', serif;
+                font-size: clamp(1.8rem, 3vw, 2.5rem);
+                color: var(--text);
+            }
+
+            .dash-header p {
+                color: var(--text-muted);
+                font-size: 0.88rem;
+                margin-top: 4px;
+            }
+
+        .new-event-btn {
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+            .new-event-btn:hover {
+                background: var(--gold-light);
+            }
+
+        /* TABS */
+        .dash-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid rgba(201,168,76,0.15);
+            margin-bottom: 2rem;
+        }
+
+        .dash-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: -1px;
+        }
+
+            .dash-tab:hover {
+                color: var(--text);
+            }
+
+            .dash-tab.active {
+                color: var(--gold);
+                border-bottom-color: var(--gold);
+            }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        /* MY EVENTS TABLE */
+        .events-table-wrap {
+            background: #141414;
+            border: 1px solid rgba(201,168,76,0.12);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1a1a1a;
+            padding: 0.9rem 1.2rem;
+            text-align: left;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .pill-active {
+            background: rgba(104,211,145,0.12);
+            color: #68d391;
+        }
+
+        .pill-upcoming {
+            background: rgba(201,168,76,0.12);
+            color: var(--gold);
+        }
+
+        .pill-ended {
+            background: rgba(255,255,255,0.06);
+            color: #666;
+        }
+
+        .edit-btn {
+            background: transparent;
+            border: 1px solid rgba(201,168,76,0.3);
+            color: var(--gold);
+            padding: 5px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 6px;
+        }
+
+            .edit-btn:hover {
+                background: rgba(201,168,76,0.1);
+            }
+
+        .del-btn {
+            background: transparent;
+            border: 1px solid rgba(229,62,62,0.3);
+            color: #fc8181;
+            padding: 5px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .del-btn:hover {
+                background: rgba(229,62,62,0.1);
+            }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s;
+        }
+
+            .modal-overlay.open {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .modal {
+            background: #1a1a1a;
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(16px);
+            transition: transform 0.25s;
+        }
+
+        .modal-overlay.open .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+            .modal-header h3 {
+                font-family: 'Playfair Display', serif;
+                color: var(--text);
+                font-size: 1.3rem;
+            }
+
+        .modal-close {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+            .modal-close:hover {
+                border-color: var(--gold);
+                color: var(--gold);
+            }
+
+        .m-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .m-label {
+            display: block;
+            font-size: 0.63rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .m-input {
+            width: 100%;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            padding: 0.8rem 1rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+            .m-input:focus {
+                border-color: var(--gold);
+            }
+
+            .m-input::placeholder {
+                color: rgba(255,255,255,0.2);
+            }
+
+        .m-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .m-submit {
+            width: 100%;
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            padding: 0.9rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+
+            .m-submit:hover {
+                background: var(--gold-light);
+            }
+
+        .m-error {
+            background: rgba(229,62,62,0.1);
+            border: 1px solid rgba(229,62,62,0.3);
+            color: #fc8181;
+            padding: 0.75rem 1rem;
+            font-size: 0.82rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        @@media (max-width: 768px) {
+            .dash-page {
+                padding: 5rem 1.5rem 3rem;
+            }
+
+            .m-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dash-action-btn {
+            background: transparent;
+            border: 1px solid rgba(201,168,76,0.3);
+            color: var(--gold);
+            padding: 5px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 6px;
+        }
+
+            .dash-action-btn:hover {
+                background: rgba(201,168,76,0.1);
+            }
+
+            .dash-action-btn.delete {
+                border-color: rgba(229,62,62,0.3);
+                color: #fc8181;
+            }
+
+                .dash-action-btn.delete:hover {
+                    background: rgba(229,62,62,0.1);
+                }
+
+        .status-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .dot-active {
+            background: #68d391;
+        }
+
+        .dot-upcoming {
+            background: var(--gold);
+        }
+
+        .dot-ended {
+            background: #666;
+        }
+
+        .dot-hidden {
+            background: #444;
+        }
+    </style>
+}
+
+<div class="dash-page">
+    <div class="dash-header">
+        <div>
+            <h1>My Dashboard</h1>
+            <p>Welcome back, <strong style="color:var(--gold)">@Model.UserName</strong></p>
+        </div>
+        <button class="new-event-btn" onclick="openModal('create')">+ New Event</button>
+    </div>
+
+    <div class="dash-tabs">
+        <button class="dash-tab active" onclick="switchTab('my-events', this)">My Events</button>
+        <button class="dash-tab" onclick="switchTab('registrations', this)">Registrations</button>
+    </div>
+
+ 
+    <div id="tab-my-events" class="tab-content active">
+        <div class="events-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="myEventsBody">
+                    <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+ 
+    <div id="tab-registrations" class="tab-content">
+        <div class="events-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Email</th>
+                        <th>Event</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="regsBody">
+                    <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted)">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" id="eventModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle">New Event</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div id="modalError"></div>
+        <input type="hidden" id="editEventId">
+        <div class="m-group">
+            <label class="m-label">Event Title *</label>
+            <input class="m-input" id="fTitle" placeholder="e.g. Kandy Cultural Night">
+        </div>
+        <div class="m-row">
+            <div class="m-group">
+                <label class="m-label">Type *</label>
+                <select class="m-input" id="fType">
+                    <option value="">All Events</option>
+                    <option value="Arts & Crafts">🎨 Arts & Crafts</option>
+                    <option value=" Eco & Sustainability">🌿 Eco & Sustainability</option>
+                    <option value="Wellness & Mindfulness">🧘 Wellness & Mindfulness</option>
+                    <option value="Gaming & Esports">🎮 Gaming & Esports</option>
+                    <option value="Science & Technology">🚀 Science & Technology</option>
+                    <option value="Comedy & Stand-up">🎤 Comedy & Stand-up</option>
+                    <option value="Adventure & Outdoors">🚲 Adventure & Outdoors</option>
+                </select>
+            </div>
+            <div class="m-group">
+                <label class="m-label">Capacity *</label>
+                <input class="m-input" id="fCapacity" type="number" placeholder="100" min="1">
+            </div>
+        </div>
+        <div class="m-group">
+            <label class="m-label">Location *</label>
+            <input class="m-input" id="fLocation" placeholder="Kandy City Centre">
+        </div>
+        <div class="m-row">
+            <div class="m-group">
+                <label class="m-label">Start Date & Time *</label>
+                <input class="m-input" id="fStartDate" type="datetime-local">
+            </div>
+            <div class="m-group">
+                <label class="m-label">End Date & Time</label>
+                <input class="m-input" id="fEndDate" type="datetime-local">
+            </div>
+        </div>
+        <div class="m-group">
+            <label class="m-label">Event Image</label>
+
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <input type="file"
+                       id="fImageFile"
+                       accept="image/*"
+                       style="display: none;"
+                       onchange="handleImageSelect(this)" />
+
+                <button type="button"
+                        class="m-submit"
+                        style="background:#333; width: auto; padding: 0.75rem 1.4rem; font-size: 0.85rem;"
+                        onclick="document.getElementById('fImageFile').click()">
+                    📸 Choose Image from Device
+                </button>
+
+                <span id="selectedFileName" style="font-size: 0.85rem; color: #aaa; flex: 1;"></span>
+            </div>
+
+           
+            <div id="imagePreviewContainer" style="margin-top: 12px; display: none;">
+                <img id="imagePreview" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #444;" />
+            </div>
+        </div>
+        <div class="m-group">
+            <label class="m-label">Description</label>
+            <textarea class="m-input" id="fDesc" rows="3"
+                      placeholder="Describe your event..."></textarea>
+        </div>
+        <button class="m-submit" onclick="submitEvent()">Save Event →</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const API = 'https://localhost:7096/api';
+        const orgId = parseInt('@Model.UserId') || 0;
+        const orgRole = '@Model.UserRole';
+
+      
+        if (!orgRole || orgRole !== 'Organizer') window.location.href = '/Login';
+
+     
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            btn.classList.add('active');
+            if (id === 'registrations') loadRegistrations();
+        }
+
+        
+        function openModal(mode, ev) {
+            document.getElementById('modalError').innerHTML = '';
+            document.getElementById('eventModal').classList.add('open');
+
+            
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('selectedFileName').textContent = '';
+            document.getElementById('fImageFile').value = '';
+
+            if (mode === 'create') {
+                document.getElementById('modalTitle').textContent = 'New Event';
+                document.getElementById('editEventId').value = '';
+                document.getElementById('fTitle').value = '';
+                document.getElementById('fType').value = '';
+                document.getElementById('fCapacity').value = '';
+                document.getElementById('fLocation').value = '';
+                document.getElementById('fStartDate').value = '';
+                document.getElementById('fEndDate').value = '';
+                document.getElementById('fDesc').value = '';
+            } else {
+                document.getElementById('modalTitle').textContent = 'Edit Event';
+                document.getElementById('editEventId').value = ev.id;
+                document.getElementById('fTitle').value = ev.title || '';
+                document.getElementById('fType').value = ev.type || '';
+                document.getElementById('fCapacity').value = ev.capacity || '';
+                document.getElementById('fLocation').value = ev.location || '';
+                document.getElementById('fStartDate').value = ev.startDate?.slice(0,16) || '';
+                document.getElementById('fEndDate').value = ev.endDate?.slice(0,16) || '';
+                document.getElementById('fDesc').value = ev.description || '';
+
+                
+                if (ev.eventImage) {
+                    document.getElementById('imagePreview').src =
+                        `https://localhost:7096${ev.eventImage}`;
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                    document.getElementById('selectedFileName').textContent = 'Current image';
+                }
+            }
+        }
+
+       
+        async function editEvent(id) {
+            try {
+                const res = await fetch(`${API}/event/${id}`);
+                if (!res.ok) throw new Error('Failed to load event');
+                const ev = await res.json();
+                openModal('edit', ev);
+            } catch(e) {
+                console.error(e);
+                alert('Failed to load event details!');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('eventModal').classList.remove('open');
+        }
+
+        document.getElementById('eventModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        
+             async function loadMyEvents() {
+            if (!orgId || orgId === 0) {
+                document.getElementById('myEventsBody').innerHTML =
+                    `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted)">
+                        Please log in as Organizer
+                    </td></tr>`;
+                return;
+            }
+
+            try {
+                
+                const res = await fetch(`${API}/event/organizer/${orgId}`);
+
+                if (!res.ok) {
+                    throw new Error('Failed to load events');
+                }
+
+                const events = await res.json();
+
+                const tbody = document.getElementById('myEventsBody');
+                tbody.innerHTML = '';
+
+                if (events.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted)">
+                        You have not created any events yet.
+                    </td></tr>`;
+                    return;
+                }
+
+                events.forEach(ev => {
+                    const row = `
+                        <tr>
+                            <td>${ev.title}</td>
+                            <td>${ev.type || 'General'}</td>
+                            <td>${formatDate(ev.startDate)}</td>
+                            <td>${ev.capacity}</td>
+                            <td><span class="status-dot dot-${getStatus(ev.startDate, ev.endDate)}"></span> ${getStatus(ev.startDate, ev.endDate)}</td>
+                            <td>
+                                <button onclick="editEvent(${ev.id})" class="dash-action-btn">Edit</button>
+                                <button onclick="deleteEvent(${ev.id})" class="dash-action-btn delete">Delete</button>
+                            </td>
+                        </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch (e) {
+                console.error(e);
+                document.getElementById('myEventsBody').innerHTML =
+                    `<tr><td colspan="6" style="text-align:center; color:red">Error loading your events</td></tr>`;
+            }
+        }
+
+        function getStatus(startDate, endDate) {
+            const now = new Date();
+            const start = new Date(startDate);
+            const end = endDate ? new Date(endDate) : null;
+            if (end) {
+                const hide = new Date(end);
+                hide.setDate(hide.getDate() + 1);
+                if (now > hide) return 'hidden';
+                if (now > end) return 'ended';
+            }
+            if (now < start) return 'upcoming';
+            return 'active';
+        }
+
+        function formatDate(d) {
+            if (!d) return '—';
+            return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+        }
+
+      
+                      
+        async function loadRegistrations() {
+            const tbody = document.getElementById('regsBody');
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted)">Loading...</td></tr>`;
+
+            try {
+                
+                const res = await fetch(`${API}/eventregistration/organizer/${orgId}`);
+
+                if (!res.ok) {
+                    throw new Error('Failed to load registrations');
+                }
+
+                const registrations = await res.json();
+
+                if (!registrations.length) {
+                    tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No one has registered for your events yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = registrations.map(r => `
+                    <tr>
+                        <td>${r.participantName || '—'}</td>
+                        <td>${r.participantEmail || '—'}</td>
+                        <td>${r.eventTitle || '—'}</td>
+                        <td>${formatDate(r.registeredAt)}</td>
+                    </tr>
+                `).join('');
+
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="4" style="color:#fc8181;padding:1rem">Failed to load your event registrations.</td></tr>`;
+            }
+        }
+
+       
+               
+        async function submitEvent() {
+            const errEl = document.getElementById('modalError');
+            errEl.innerHTML = '';
+
+            const title = document.getElementById('fTitle').value.trim();
+            const type = document.getElementById('fType').value;
+            const capacity = parseInt(document.getElementById('fCapacity').value);
+            const location = document.getElementById('fLocation').value.trim();
+            const startDate = document.getElementById('fStartDate').value;
+
+            if (!title || !type || !capacity || !location || !startDate) {
+                errEl.innerHTML = `<div class="m-error">Please fill in all required fields.</div>`;
+                return;
+            }
+
+            const editId = document.getElementById('editEventId').value;
+            const formData = new FormData();
+
+            formData.append('title', title);
+            formData.append('type', type);
+            formData.append('capacity', capacity);
+            formData.append('location', location);
+            formData.append('startDate', startDate);
+
+            const endDateVal = document.getElementById('fEndDate').value;
+            if (endDateVal) {
+                formData.append('endDate', endDateVal);
+            }
+
+            formData.append('description', document.getElementById('fDesc').value || '');
+            formData.append('organizerId', orgId);
+            formData.append('status', 'Active');
+
+           
+            const imageFile = document.getElementById('fImageFile').files[0];
+            if (imageFile) {
+                formData.append('eventImageFile', imageFile);
+            }
+
+            const url = editId ? `${API}/event/${editId}` : `${API}/event`;
+            const method = editId ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    body: formData   
+                });
+
+                if (res.ok) {
+                    closeModal();
+                    loadMyEvents();
+                    alert(editId ? 'Event updated successfully!' : 'Event created successfully!');
+                } else {
+                    const errorText = await res.text();
+                    errEl.innerHTML = `<div class="m-error">${errorText || 'Failed to save event.'}</div>`;
+                }
+            } catch (e) {
+                console.error(e);
+                errEl.innerHTML = `<div class="m-error">Network error. Please check if the API is running.</div>`;
+            }
+        }
+
+        async function deleteEvent(id) {
+            if (!confirm('Delete this event? This cannot be undone.')) return;
+            const res = await fetch(`${API}/event/${id}`, { method: 'DELETE' });
+            if (res.ok) loadMyEvents();
+            else alert('Failed to delete event.');
+        }
+               
+        let selectedImageFile = null;
+
+        function handleImageSelect(input) {
+            if (input.files && input.files[0]) {
+                selectedImageFile = input.files[0];
+
+                const fileNameSpan = document.getElementById('selectedFileName');
+                fileNameSpan.textContent = selectedImageFile.name;
+
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(selectedImageFile);
+            }
+        }
+
+        loadMyEvents();
+    </script>
+}

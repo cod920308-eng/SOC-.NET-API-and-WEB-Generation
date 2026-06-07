@@ -1,0 +1,311 @@
+﻿@page
+@model PrivateWeb.Pages.AdminDashboardModel
+@{ ViewData["Title"] = "Admin Dashboard"; }
+
+@section Styles {
+<style>
+.admin-page {
+    padding: 6rem 4rem 4rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.admin-hero {
+    margin-bottom: 2.5rem;
+}
+
+.admin-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.admin-hero p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.admin-badge {
+    display: inline-block;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.25);
+    color: var(--gold);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+}
+
+.admin-card {
+    background: #141414;
+    border: 1px solid rgba(201,168,76,0.12);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.admin-card-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-card-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--text);
+}
+
+.admin-card-body {
+    padding: 2rem;
+}
+
+/* ROLE PILLS */
+.role-pills {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #1a1a1a;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.role-pill {
+    flex: 1;
+    padding: 0.9rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.2s;
+}
+
+.role-pill:last-child {
+    border-right: none;
+}
+
+.role-pill-icon {
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.role-pill-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.role-pill.active {
+    background: rgba(201,168,76,0.1);
+}
+
+.role-pill.active .role-pill-label {
+    color: var(--gold);
+}
+
+/* FORM */
+.f-group {
+    margin-bottom: 1.2rem;
+}
+
+.f-label {
+    display: block;
+    font-size: 0.63rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.f-input {
+    width: 100%;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    padding: 0.85rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+.f-input:focus {
+    border-color: var(--gold);
+}
+
+.f-input::placeholder {
+    color: rgba(255,255,255,0.15);
+}
+
+.f-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.f-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+}
+
+.f-submit {
+    width: 100%;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    padding: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 0.5rem;
+}
+
+.f-submit:hover {
+    background: var(--gold-light);
+}
+
+.f-error {
+    background: rgba(229,62,62,0.1);
+    border: 1px solid rgba(229,62,62,0.3);
+    color: #fc8181;
+    padding: 0.8rem 1rem;
+    font-size: 0.82rem;
+    border-radius: 6px;
+    margin-bottom: 1.2rem;
+}
+
+.f-success {
+    background: rgba(104,211,145,0.1);
+    border: 1px solid rgba(104,211,145,0.3);
+    color: #68d391;
+    padding: 0.8rem 1rem;
+    font-size: 0.82rem;
+    border-radius: 6px;
+    margin-bottom: 1.2rem;
+}
+
+.role-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+}
+
+@@media (max-width: 768px) {
+    .admin-page { padding: 5rem 1.5rem 3rem; }
+    .f-row { grid-template-columns: 1fr; }
+}
+</style>
+}
+
+<div class="admin-page">
+    <div class="admin-hero">
+        <div class="admin-badge">🔑 Admin Panel</div>
+        <h1>Admin Dashboard</h1>
+        <p>Logged in as <strong style="color:var(--gold)">@Model.UserName</strong></p>
+    </div>
+
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h2>Create Account</h2>
+            <span style="font-size:.8rem;color:var(--text-muted)">Add citizens or organizers</span>
+        </div>
+        <div class="admin-card-body">
+
+           
+            <div class="role-pills">
+                <button type="button" class="role-pill active" onclick="setRole('Citizen', this)">
+                    <span class="role-pill-icon">👤</span>
+                    <span class="role-pill-label">Citizen</span>
+                </button>
+               
+            </div>
+
+            <p class="role-desc" id="roleDesc">
+                Citizens can browse and register for events on the platform.
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="f-error">⚠ @Model.ErrorMessage</div>
+            }
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="f-success">✓ @Model.SuccessMessage</div>
+            }
+
+            <form method="post">
+                <input type="hidden" name="Role" id="roleInput" value="Citizen" />
+
+                <div class="f-group">
+                    <label class="f-label">Full Name *</label>
+                    <input class="f-input" name="FullName" type="text"
+                           placeholder="Full name" required />
+                </div>
+
+                <div class="f-group">
+                    <label class="f-label">Email Address *</label>
+                    <input class="f-input" name="Email" type="email"
+                           placeholder="email@example.com" required />
+                </div>
+                <div class="f-group">
+                    <label class="f-label">Phone Number</label>
+                    <input class="f-input" name="Phone" type="tel"
+                           placeholder="07X XXX XXXX" />
+                </div>
+
+               
+
+                <div class="f-row">
+                    <div class="f-group">
+                        <label class="f-label">Password *</label>
+                        <input class="f-input" name="Password" type="password"
+                               placeholder="••••••••" required />
+                        <p class="f-hint">Min. 6 characters</p>
+                    </div>
+                    <div class="f-group">
+                        <label class="f-label">Confirm Password *</label>
+                        <input class="f-input" name="Confirm" type="password"
+                               placeholder="••••••••" required />
+                    </div>
+                </div>
+
+                <button class="f-submit" type="submit">Create Account →</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Redirect if not admin
+    const role = '@Model.UserRole';
+		if (role !== 'Admin') alert("Citizen Account Added Successfully!");
+
+   
+</script>
+}

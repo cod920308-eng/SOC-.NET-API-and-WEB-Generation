@@ -1,0 +1,292 @@
+@page
+@model PrivateWeb.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+@section Styles {
+    <style>
+        .hero {
+            min-height: calc(100vh - 72px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 64px;
+            position: relative;
+        }
+
+            .hero-left::before {
+                content: 'AKPE';
+                position: absolute;
+                top: 60px;
+                left: 64px;
+                font-family: 'Playfair Display', serif;
+                font-size: 120px;
+                color: rgba(201,168,76,0.04);
+                font-weight: 700;
+                pointer-events: none;
+                line-height: 1;
+            }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(201,168,76,0.1);
+            border: 1px solid var(--border);
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 100px;
+            width: fit-content;
+            margin-bottom: 32px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(42px, 5vw, 64px);
+            line-height: 1.1;
+            color: var(--text);
+            margin-bottom: 24px;
+            animation: fadeUp 0.6s ease 0.1s both;
+        }
+
+            .hero-title em {
+                color: var(--gold);
+                font-style: normal;
+            }
+
+        .hero-desc {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.7;
+            max-width: 440px;
+            margin-bottom: 48px;
+            animation: fadeUp 0.6s ease 0.2s both;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            animation: fadeUp 0.6s ease 0.3s both;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: var(--dark);
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s;
+            display: inline-block;
+        }
+
+            .btn-primary:hover {
+                background: var(--gold-light);
+                transform: translateY(-2px);
+            }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 400;
+            font-size: 15px;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s, transform 0.2s;
+            display: inline-block;
+        }
+
+            .btn-secondary:hover {
+                border-color: var(--gold);
+                color: var(--gold);
+                transform: translateY(-2px);
+            }
+
+        .hero-right {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: brightness(0.7);
+        }
+
+        .hero-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, var(--dark) 0%, transparent 40%);
+        }
+
+        .hero-badge {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            background: rgba(13,13,13,0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            animation: fadeUp 0.6s ease 0.4s both;
+        }
+
+        .hero-badge-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            color: var(--gold);
+            line-height: 1;
+        }
+
+        .hero-badge-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .features {
+            padding: 100px 64px;
+            background: var(--dark2);
+            border-top: 1px solid var(--border);
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+            .features-header h2 {
+                font-family: 'Playfair Display', serif;
+                font-size: 40px;
+                color: var(--text);
+                margin-bottom: 12px;
+            }
+
+            .features-header p {
+                color: var(--text-muted);
+                font-size: 15px;
+            }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--dark3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 36px 28px;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+            .feature-card:hover {
+                border-color: var(--gold);
+                transform: translateY(-4px);
+            }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @@keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+}
+
+<section class="hero">
+    <div class="hero-left">
+        <div class="hero-tag">✦ Public Events Portal</div>
+        <h1 class="hero-title">
+            Kandy's Events,<br>
+            All in <em>One Place</em>
+        </h1>
+        <p class="hero-desc">
+			Aloka Public Events Kandy is your go-to platform for discovering
+            and registering for community events across Kandy. From cultural
+            festivals to public meetings — find it all here.
+        </p>
+        <div class="hero-actions">
+            <a href="/Events" class="btn-primary">Browse Events</a>
+            <a href="/Register" class="btn-secondary">Join Now</a>
+        </div>
+    </div>
+
+    <div class="hero-right">
+        <img src="~/images/kandy.jpg" alt="Kandy City" class="hero-img"
+             onerror="this.style.background='linear-gradient(135deg,#1a1a1a,#252525)';this.style.display='block'" />
+        <div class="hero-img-overlay"></div>
+        <div class="hero-badge">
+            <div class="hero-badge-num">200+</div>
+            <div class="hero-badge-label">Public Events Listed</div>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="features-header">
+        <h2>Why Use Our Platform?</h2>
+        <p>Discover, register, and participate in Kandy's best public events</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon">🔍</span>
+            <h3 class="feature-title">Discover Events</h3>
+            <p class="feature-desc">Browse events by category, date and location. Find exactly what's happening near you across the city of Kandy.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">✅</span>
+            <h3 class="feature-title">Easy Registration</h3>
+            <p class="feature-desc">Register for any event with a single click. Track all your upcoming registrations from your personal dashboard.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🌿</span>
+            <h3 class="feature-title">Community First</h3>
+            <p class="feature-desc">Built for the people of Kandy. Every event listed here is verified and organized by trusted local organizers.</p>
+        </div>
+    </div>
+</section>
